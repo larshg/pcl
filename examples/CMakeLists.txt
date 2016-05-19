@@ -10,9 +10,9 @@ PCL_SUBSYS_DEPEND(build ${SUBSYS_NAME} DEPS ${SUBSYS_DEPS})
 if (build)
     include_directories(${PCL_INCLUDE_DIRS})
     # This looks for all examples/XXX/CMakeLists.txt
-    file (GLOB examples_sbudirs */CMakeLists.txt)
+    file (GLOB examples_subdirs */CMakeLists.txt)
     # Extract only relevant XXX and append it to PCL_EXAMPLES_SUBDIRS
-    foreach(subdir ${examples_sbudirs})
+    foreach(subdir ${examples_subdirs})
         # PATH of get_filename_component has problem dealing with windows shared folders "//xxx.xxx.xxx.xxx/folder"
         # Check here for the discussion: http://www.pcl-developers.org/Small-hack-to-get-filename-component-td5706691.html
         # Modified by Yangyan Li(yangyan.lee@gmail.com)
