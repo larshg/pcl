@@ -137,7 +137,7 @@ using vcpkg is to run the install command from our `docker file <https://github.
 
   ./vcpkg install dependencies_here --triplet triplet_type
 
-I would omit the *--clean-after-build*, as this would remove the source code of the dependencies and limit debugging capabilities for those.
+Remember to omit the *--clean-after-build*, as this removes the source code of the dependencies and limit debugging capabilities for those.
 
 To build PCL, you would have to get the `source <https://github.com/PointCloudLibrary/pcl>`_, preferably clone it using git.
 
