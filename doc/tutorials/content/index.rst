@@ -97,7 +97,7 @@ Basic Usage
      .. |mi_3| image:: images/pcl_ccmake.png
                :height: 100px
 
-  * :ref:`_use_pcl_windows`
+  * :ref:`pcl_vcpkg_windows`
 
      ======  ======
      |mi_4|  Title: **Install PCL using VCPKG**

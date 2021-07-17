@@ -1,7 +1,7 @@
-.. _use_pcl_windows:
+.. _pcl_vcpkg_windows:
 
 Using PCL on windows with VCPKG and CMake
-------------------------------------
+-----------------------------------------
 
 This tutorial explains how to acquire Point Cloud Library on
 Microsoft Windows platforms using `VCPKG <https://github.com/microsoft/vcpkg>`_.
@@ -29,33 +29,33 @@ Navigate to *c:\\vcpkg* in **powershell** and run
 This will download vcpkg.exe.
 
 
-PCLs dependencies
+PCL's dependencies
 ==================
 
-PCLs required dependencies available on VCPKG are:
+PCL's required dependencies available on VCPKG are:
 
 * Boost
 * FLANN
 * Eigen3
 
-PCLs optionel dependencies available on VCPKG are:
+PCL's optional dependencies available on VCPKG are:
 
 * VTK - for visualization module
   
   * Feature OpenGL - required
-  * Feature Qt - optionel for QVTK, used in apps
+  * Feature Qt - optional for QVTK, used in apps
   
 * GLEW - for simulation module
 * Qhull - for convex/concave in surface module
 * Qt - for apps that use Qt for GUI
 * Google Test - for unit tests
-* Google Benchmark - for benchmars
+* Google Benchmark - for benchmarks
 * OpenNI2
 * Realsense2
 * PNG - for a single openni app
 * Pcap - for Velodyne HDL driver
 
-PCLs optionel dependencies not on VCPKG
+PCL's optional dependencies not on VCPKG
 
 * CUDA - only a port that verify its installed (version 10.1).
 * GLUT
@@ -67,7 +67,7 @@ PCLs optionel dependencies not on VCPKG
 
 
 Install PCL for usage
-==================
+=====================
 
 Running the following command in powershell in the VCPKG directory,
 will install PCL with default options as well as default triplet type (ie. x86).
@@ -77,8 +77,8 @@ will install PCL with default options as well as default triplet type (ie. x86).
 
 .. note::
 
-  If there are new features or bugfixes that is not yet part of a release,
-  you can try use --head, which downloads the master of PCL.
+  If there are new features or bugfixes that are not yet part of a release,
+  you can try to use --head, which downloads the master of PCL.
   
   - 2021-06-25 PCL 11(.1) doesn't support VTK 9, so if you need visualization module, use --head
 
@@ -105,7 +105,7 @@ in vcpkg/installed/triplet_type/bin for release and vcpkg/installed/triplet_type
 
 
 Using dependencies installed with VCPKG in CMake projects
-==================
+=========================================================
 
 Use `CMake <https://cmake.org/download>`_ to configure projects and remember to pass **vcpkg\\scripts\\buildsystems\\vcpkg.cmake** as toolchain file
 to enable CMake to find all the dependencies installed with VCPKG.
@@ -124,13 +124,13 @@ See example below using the cmake window:
            
 
 Find PCL using CMake
-==================
+====================
 
-To use PCL in CMake project, take a look at Kunals Tyagi's minimal example `here <https://github.com/kunaltyagi/pcl-cmake-minimum>`_
+To use PCL in CMake project, take a look at Kunal Tyagi's minimal example `in this repository <https://github.com/kunaltyagi/pcl-cmake-minimum>`_
 
 
 Install PCL dependencies for contributions
-==================
+==========================================
 
 If you want to contribute to PCL, the easiest way to get dependencies
 using vcpkg is to run the install command from our `docker file <https://github.com/PointCloudLibrary/pcl/blob/master/.dev/docker/windows/Dockerfile>`_
