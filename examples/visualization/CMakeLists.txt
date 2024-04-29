@@ -1,0 +1,2 @@
+PCL_ADD_EXAMPLE(pcl_example_visualize_normals FILES pcl_example_visualize_normals.cpp LINK_WITH pcl_common pcl_features pcl_filters pcl_visualization)
+
