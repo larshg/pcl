@@ -1,9 +1,13 @@
+#include <pcl/filters/filter.h>
 #include <pcl/features/normal_3d_omp.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
 #include <pcl/visualization/pcl_visualizer.h>
 
 #include <iostream>
+#include <chrono>
+
+using namespace std::chrono;
 
 int main(int argc, char** argv) {
 
@@ -16,30 +20,37 @@ int main(int argc, char** argv) {
 
   pcl::console::print_info ("Reading %s\n", argv[1]);
 
-
   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
   if (pcl::io::loadPCDFile<pcl::PointXYZ>(argv[1], *cloud) == -1) {
     pcl::console::print_error ("Couldn't read file %s!\n", argv[1]);
     return -1;
   }
 
+  pcl::PointCloud<pcl::PointXYZ>::Ptr cloudfiltered(new pcl::PointCloud<pcl::PointXYZ>);
+  pcl::Indices indices;
+  //pcl::removeNaNFromPointCloud(*cloud, *cloudfiltered, indices);
+  cloudfiltered = cloud;
+
   pcl::NormalEstimationOMP<pcl::PointXYZ, pcl::Normal> ne;
-  ne.setInputCloud(cloud);
+  ne.setInputCloud(cloudfiltered);
   ne.setNumberOfThreads(8);
-  pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(
-      new pcl::search::KdTree<pcl::PointXYZ>());
+  pcl::search::KdTree<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>());
   ne.setSearchMethod(tree);
   pcl::PointCloud<pcl::Normal>::Ptr normals(new pcl::PointCloud<pcl::Normal>);
   ne.setKSearch(100); 
   ne.setViewPoint(100, 100, 1000);
+  auto start = high_resolution_clock::now();
   ne.compute(*normals);
+  auto stop = high_resolution_clock::now();
+  std::chrono::duration<double, std::milli> duration = stop - start;
+  std::cout << duration.count() << "\n";
 
 
   pcl::visualization::PCLVisualizer viewer("Point Cloud Viewer");
   viewer.setBackgroundColor(0.0, 0.0, 0.0);
-  viewer.addPointCloud<pcl::PointXYZ>(cloud, "cloud");
+  viewer.addPointCloud<pcl::PointXYZ>(cloudfiltered, "cloud");
   viewer.addPointCloudNormals<pcl::PointXYZ, pcl::Normal>(
-      cloud, normals, 200, 20, "normals");
+      cloudfiltered, normals, 200, 20, "normals");
   viewer.setPointCloudRenderingProperties(
       pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "cloud");
   viewer.spin();
