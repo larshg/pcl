@@ -96,6 +96,14 @@ if (vtkMissingComponents)
   message(FATAL_ERROR "Missing vtk modules: ${vtkMissingComponents}")
 endif()
 
+message(STATUS "VTK version: ${VTK_VERSION}")
+message(STATUS "VTK rendering backend: ${VTK_RENDERING_BACKEND}")
+
+if("IOOCCT" IN_LIST VTK_AVAILABLE_COMPONENTS)
+  set(HAVE_IOOCCT TRUE)
+  message(STATUS "VTK build with IOOCCT support (stp files)")
+endif()
+
 if("vtkGUISupportQt" IN_LIST VTK_MODULES_ENABLED)
   set(HAVE_QVTK TRUE)
   #PCL_VTK_COMPONENTS is used in the PCLConfig.cmake to refind the required modules.
@@ -110,6 +118,12 @@ elseif("GUISupportQt" IN_LIST VTK_AVAILABLE_COMPONENTS AND "RenderingQt" IN_LIST
   list(APPEND PCL_VTK_COMPONENTS GUISupportQt)
 else()
   unset(HAVE_QVTK)
+endif()
+
+if(HAVE_QVTK)
+  message(STATUS "VTK Qt support: YES")
+else()
+  message(STATUS "VTK Qt support: NOTFOUND")
 endif()
 
 if(PCL_SHARED_LIBS OR (NOT (PCL_SHARED_LIBS) AND NOT (VTK_BUILD_SHARED_LIBS)))
@@ -127,15 +141,6 @@ else()
   set(VTK_FOUND OFF)
   message("Warning: You are to build PCL in STATIC but VTK is SHARED!")
   message("Warning: VTK disabled!")
-endif()
-
-message(STATUS "VTK version: ${VTK_VERSION}")
-message(STATUS "VTK rendering backend: ${VTK_RENDERING_BACKEND}")
-
-if(HAVE_QVTK)
-  message(STATUS "VTK Qt support: YES")
-else()
-  message(STATUS "VTK Qt support: NOTFOUND")
 endif()
 
 if(VTK_INCLUDE_DIRS)

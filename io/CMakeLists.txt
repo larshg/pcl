@@ -348,6 +348,9 @@ if(VTK_FOUND)
                           VTK::IOImage
                           VTK::IOGeometry
                           VTK::IOPLY)
+    if(HAVE_IOOCCT)
+      target_link_libraries(${LIB_NAME} VTK::IOOCCT)
+    endif()
   else()
     link_directories(${VTK_LINK_DIRECTORIES})
     target_link_libraries("${LIB_NAME}"

@@ -53,6 +53,9 @@
 #include <vtkPNGWriter.h> // for vtkPNGWriter
 #include <vtkSTLReader.h> // for vtkSTLReader
 #include <vtkSTLWriter.h> // for vtkSTLWriter
+#ifdef HAVE_IOOCCT
+#include <vtkOCCTReader.h> // for vtkSTPReader
+#endif
 #include <vtkUnsignedCharArray.h> // for vtkUnsignedCharArray
 
 // Support for VTK 7.1 upwards
@@ -174,6 +177,55 @@ pcl::io::loadPolygonFileSTL (const std::string &file_name, pcl::PolygonMesh& mes
 
   return (pcl::io::vtk2mesh (poly_data, mesh));
 }
+
+#ifdef HAVE_IOOCCT
+
+void
+pcl::io::recursivelyAddPoly(vtkSmartPointer<vtkMultiBlockDataSet> dataset,
+                            vtkSmartPointer<vtkAppendPolyData> filter)
+{
+  auto nrBlocks = dataset->GetNumberOfBlocks();
+  for (int i = 0; i < nrBlocks; i++) {
+    auto nextDataSet = dataset->GetBlock(i);
+    if (nextDataSet->IsA("vtkPolyData")) {
+      auto poly = vtkPolyData::SafeDownCast(dataset->GetBlock(i));
+      filter->AddInputData(poly);
+    }
+    else if (nextDataSet->IsA("vtkMultiBlockDataSet")) {
+      pcl::io::recursivelyAddPoly(
+          vtkMultiBlockDataSet::SafeDownCast(nextDataSet), filter);
+    }
+  }
+}
+
+
+vtkSmartPointer<vtkPolyData>
+pcl::io::loadPolygonFileSTP(const std::string& file_name)
+{
+  vtkSmartPointer<vtkPolyData> poly_data = vtkSmartPointer<vtkPolyData>::New();
+
+  vtkNew<vtkOCCTReader> stp_reader;
+  stp_reader->SetFileName(file_name.c_str());
+  stp_reader->SetFileFormat(0u); // Format STEP/STP
+  stp_reader->Update();
+
+  vtkSmartPointer<vtkMultiBlockDataSet> dataSet = stp_reader->GetOutput();
+  vtkNew<vtkAppendPolyData> filter;
+
+  recursivelyAddPoly(dataSet, filter);
+  filter->Update();
+
+  poly_data = filter->GetOutput();
+
+  return poly_data;
+}
+
+int
+pcl::io::loadPolygonFileSTP(const std::string& file_name, pcl::PolygonMesh& mesh)
+{
+  return (pcl::io::vtk2mesh(loadPolygonFileSTP(file_name), mesh));
+}
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 bool

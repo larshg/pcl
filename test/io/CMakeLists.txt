@@ -45,6 +45,14 @@ if(VTK_FOUND AND NOT ANDROID)
                 FILES test_ply_mesh_io.cpp
                 LINK_WITH pcl_gtest pcl_io
                 ARGUMENTS "${PCL_SOURCE_DIR}/test/tum_rabbit.vtk")
+
+  if(HAVE_IOOCCT)
+    PCL_ADD_TEST (io_step_io test_step_io
+                FILES test_step_io.cpp
+                LINK_WITH pcl_gtest pcl_io
+                ARGUMENTS "${PCL_SOURCE_DIR}/test/TestObject.stp")
+ 
+  endif()
 endif()
 
 PCL_ADD_TEST(point_cloud_image_extractors test_point_cloud_image_extractors

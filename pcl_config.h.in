@@ -91,3 +91,4 @@
 
 #cmakedefine HAVE_QVTK 1
 
+#cmakedefine HAVE_IOOCCT 1

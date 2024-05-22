@@ -40,6 +40,7 @@
 
 #pragma once
 
+#include <pcl/pcl_config.h> // for HAVE_IOOCCT
 #include <pcl/point_cloud.h>
 #include <pcl/PolygonMesh.h>
 #include <pcl/TextureMesh.h>
@@ -54,6 +55,10 @@
 #include <vtkPolyData.h> // for vtkPolyData
 #include <vtkSmartPointer.h>
 #include <vtkStructuredGrid.h>
+#ifdef HAVE_IOOCCT
+#include <vtkAppendPolyData.h> // for AppendPolyData
+#include <vtkMultiBlockDataSet.h> // for MultiBlockDataSet
+#endif
 
 namespace pcl
 {
@@ -165,6 +170,34 @@ namespace pcl
     loadPolygonFileSTL (const std::string &file_name, 
                         pcl::PolygonMesh& mesh);
 
+#ifdef HAVE_IOOCCT
+    /**
+     * @brief Accumulates vtkPolyData
+     * @param dataset from where the vtkpolydata is extracted
+     * @param filter to where the vtkpolydata is added
+     */
+    PCL_EXPORTS void
+    recursivelyAddPoly(vtkSmartPointer<vtkMultiBlockDataSet> dataset,
+                       vtkSmartPointer<vtkAppendPolyData> filter);
+
+     /** \brief Load an STP file into a vtkPolyData object
+     * \param[in] file_name the name of the file that contains the data
+     * \return smartpointer to vtkPolyData
+     * \ingroup io
+     */
+    PCL_EXPORTS vtkSmartPointer<vtkPolyData>
+    loadPolygonFileSTP(const std::string& file_name);
+
+     /** \brief Load an STP file into a \ref PolygonMesh object
+     * \param[in] file_name the name of the file that contains the data
+     * \param[out] mesh the object that we want to load the data in
+     * \return Number of points in the point cloud of the mesh.
+     * \ingroup io
+     */
+    PCL_EXPORTS int
+    loadPolygonFileSTP(const std::string& file_name,
+                       pcl::PolygonMesh& mesh);
+#endif
     /** \brief Save a \ref PolygonMesh object into a VTK file
       * \param[in] file_name the name of the file to save the data to
       * \param[in] mesh the object that contains the data
