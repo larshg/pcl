@@ -42,73 +42,167 @@
 #define PCL_REGISTRATION_IMPL_ICP_HPP_
 
 #include <pcl/correspondence.h>
+#include <pcl/common/transforms.h>
+#include <pcl/type_traits.h>
 
 namespace pcl {
 // NOLINTBEGIN(readability-container-data-pointer)
 
-template <typename PointSource, typename PointTarget, typename Scalar>
-void
-IterativeClosestPoint<PointSource, PointTarget, Scalar>::transformCloud(
-    const PointCloudSource& input, PointCloudSource& output, const Matrix4& transform)
+// template <typename PointSource, typename PointTarget, typename Scalar>
+// void
+// IterativeClosestPoint<PointSource, PointTarget, Scalar>::transformCloud(
+//     const PointCloudSource& input, PointCloudSource& output, const Matrix4&
+//     transform)
+//{
+//   Eigen::Vector4f pt(0.0f, 0.0f, 0.0f, 1.0f), pt_t;
+//   Eigen::Matrix4f tr = transform.template cast<float>();
+//
+//   // XYZ is ALWAYS present due to the templatization, so we only have to check for
+//   // normals
+//   if (source_has_normals_) {
+//     Eigen::Vector3f nt, nt_t;
+//     Eigen::Matrix3f rot = tr.block<3, 3>(0, 0);
+//
+//     for (std::size_t i = 0; i < input.size(); ++i) {
+//       const auto* data_in = reinterpret_cast<const std::uint8_t*>(&input[i]);
+//       auto* data_out = reinterpret_cast<std::uint8_t*>(&output[i]);
+//       memcpy(&pt[0], data_in + x_idx_offset_, sizeof(float));
+//       memcpy(&pt[1], data_in + y_idx_offset_, sizeof(float));
+//       memcpy(&pt[2], data_in + z_idx_offset_, sizeof(float));
+//
+//       if (!std::isfinite(pt[0]) || !std::isfinite(pt[1]) || !std::isfinite(pt[2]))
+//         continue;
+//
+//       pt_t = tr * pt;
+//
+//       memcpy(data_out + x_idx_offset_, &pt_t[0], sizeof(float));
+//       memcpy(data_out + y_idx_offset_, &pt_t[1], sizeof(float));
+//       memcpy(data_out + z_idx_offset_, &pt_t[2], sizeof(float));
+//
+//       memcpy(&nt[0], data_in + nx_idx_offset_, sizeof(float));
+//       memcpy(&nt[1], data_in + ny_idx_offset_, sizeof(float));
+//       memcpy(&nt[2], data_in + nz_idx_offset_, sizeof(float));
+//
+//       if (!std::isfinite(nt[0]) || !std::isfinite(nt[1]) || !std::isfinite(nt[2]))
+//         continue;
+//
+//       nt_t = rot * nt;
+//
+//       memcpy(data_out + nx_idx_offset_, &nt_t[0], sizeof(float));
+//       memcpy(data_out + ny_idx_offset_, &nt_t[1], sizeof(float));
+//       memcpy(data_out + nz_idx_offset_, &nt_t[2], sizeof(float));
+//     }
+//   }
+//   else {
+//     for (std::size_t i = 0; i < input.size(); ++i) {
+//       const auto* data_in = reinterpret_cast<const std::uint8_t*>(&input[i]);
+//       auto* data_out = reinterpret_cast<std::uint8_t*>(&output[i]);
+//       memcpy(&pt[0], data_in + x_idx_offset_, sizeof(float));
+//       memcpy(&pt[1], data_in + y_idx_offset_, sizeof(float));
+//       memcpy(&pt[2], data_in + z_idx_offset_, sizeof(float));
+//
+//       if (!std::isfinite(pt[0]) || !std::isfinite(pt[1]) || !std::isfinite(pt[2]))
+//         continue;
+//
+//       pt_t = tr * pt;
+//
+//       memcpy(data_out + x_idx_offset_, &pt_t[0], sizeof(float));
+//       memcpy(data_out + y_idx_offset_, &pt_t[1], sizeof(float));
+//       memcpy(data_out + z_idx_offset_, &pt_t[2], sizeof(float));
+//     }
+//   }
+// }
+
+// template <typename PointSource, typename PointTarget, typename Scalar>
+// void
+// IterativeClosestPoint<PointSource, PointTarget, Scalar>::transformCloud(
+//     const PointCloudSource& input, PointCloudSource& output, const Matrix4&
+//     transform)
+//{
+//   const Eigen::Matrix4f tr = transform.template cast<float>();
+//
+//   // XYZ is ALWAYS present due to the templatization, so we only have to check for
+//   // normals
+//   if (source_has_normals_) {
+//     const Eigen::Matrix3f rot = tr.block<3, 3>(0, 0);
+//
+// #pragma omp parallel for
+//     for (std::ptrdiff_t i = 0; i < input.size(); ++i) {
+//       const auto* data_in = reinterpret_cast<const std::uint8_t*>(&input[i]);
+//       auto* data_out = reinterpret_cast<std::uint8_t*>(&output[i]);
+//
+//       Eigen::Vector4f pt(0.0f, 0.0f, 0.0f, 1.0f);
+//       std::memcpy(&pt[0], data_in + x_idx_offset_, sizeof(float));
+//       std::memcpy(&pt[1], data_in + y_idx_offset_, sizeof(float));
+//       std::memcpy(&pt[2], data_in + z_idx_offset_, sizeof(float));
+//
+//       if (!std::isfinite(pt[0]) || !std::isfinite(pt[1]) || !std::isfinite(pt[2]))
+//         continue;
+//
+//       const Eigen::Vector4f pt_t = tr * pt;
+//
+//       std::memcpy(data_out + x_idx_offset_, &pt_t[0], sizeof(float));
+//       std::memcpy(data_out + y_idx_offset_, &pt_t[1], sizeof(float));
+//       std::memcpy(data_out + z_idx_offset_, &pt_t[2], sizeof(float));
+//
+//       Eigen::Vector3f nt;
+//       std::memcpy(&nt[0], data_in + nx_idx_offset_, sizeof(float));
+//       std::memcpy(&nt[1], data_in + ny_idx_offset_, sizeof(float));
+//       std::memcpy(&nt[2], data_in + nz_idx_offset_, sizeof(float));
+//
+//       if (!std::isfinite(nt[0]) || !std::isfinite(nt[1]) || !std::isfinite(nt[2]))
+//         continue;
+//
+//       const Eigen::Vector3f nt_t = rot * nt;
+//
+//       std::memcpy(data_out + nx_idx_offset_, &nt_t[0], sizeof(float));
+//       std::memcpy(data_out + ny_idx_offset_, &nt_t[1], sizeof(float));
+//       std::memcpy(data_out + nz_idx_offset_, &nt_t[2], sizeof(float));
+//     }
+//   }
+//   else {
+// #pragma omp parallel for
+//     for (std::ptrdiff_t i = 0; i < input.size(); ++i) {
+//       const auto* data_in = reinterpret_cast<const std::uint8_t*>(&input[i]);
+//       auto* data_out = reinterpret_cast<std::uint8_t*>(&output[i]);
+//
+//       Eigen::Vector4f pt(0.0f, 0.0f, 0.0f, 1.0f);
+//       std::memcpy(&pt[0], data_in + x_idx_offset_, sizeof(float));
+//       std::memcpy(&pt[1], data_in + y_idx_offset_, sizeof(float));
+//       std::memcpy(&pt[2], data_in + z_idx_offset_, sizeof(float));
+//
+//       if (!std::isfinite(pt[0]) || !std::isfinite(pt[1]) || !std::isfinite(pt[2]))
+//         continue;
+//
+//       const Eigen::Vector4f pt_t = tr * pt;
+//
+//       std::memcpy(data_out + x_idx_offset_, &pt_t[0], sizeof(float));
+//       std::memcpy(data_out + y_idx_offset_, &pt_t[1], sizeof(float));
+//       std::memcpy(data_out + z_idx_offset_, &pt_t[2], sizeof(float));
+//     }
+//   }
+// }
+
+ template <typename PointSource, typename PointTarget, typename Scalar>
+ void
+ IterativeClosestPoint<PointSource, PointTarget, Scalar>::transformCloud(
+     const PointCloudSource& input, PointCloudSource& output, const Matrix4&
+     transform)
 {
-  Eigen::Vector4f pt(0.0f, 0.0f, 0.0f, 1.0f), pt_t;
-  Eigen::Matrix4f tr = transform.template cast<float>();
+   if (source_has_normals_)
+    computeTransformedPointCloudWithNormal(input, output, transform);
+   else
+     pcl::transformPointCloud(input, output, transform);
+ }
 
-  // XYZ is ALWAYS present due to the templatization, so we only have to check for
-  // normals
-  if (source_has_normals_) {
-    Eigen::Vector3f nt, nt_t;
-    Eigen::Matrix3f rot = tr.block<3, 3>(0, 0);
-
-    for (std::size_t i = 0; i < input.size(); ++i) {
-      const auto* data_in = reinterpret_cast<const std::uint8_t*>(&input[i]);
-      auto* data_out = reinterpret_cast<std::uint8_t*>(&output[i]);
-      memcpy(&pt[0], data_in + x_idx_offset_, sizeof(float));
-      memcpy(&pt[1], data_in + y_idx_offset_, sizeof(float));
-      memcpy(&pt[2], data_in + z_idx_offset_, sizeof(float));
-
-      if (!std::isfinite(pt[0]) || !std::isfinite(pt[1]) || !std::isfinite(pt[2]))
-        continue;
-
-      pt_t = tr * pt;
-
-      memcpy(data_out + x_idx_offset_, &pt_t[0], sizeof(float));
-      memcpy(data_out + y_idx_offset_, &pt_t[1], sizeof(float));
-      memcpy(data_out + z_idx_offset_, &pt_t[2], sizeof(float));
-
-      memcpy(&nt[0], data_in + nx_idx_offset_, sizeof(float));
-      memcpy(&nt[1], data_in + ny_idx_offset_, sizeof(float));
-      memcpy(&nt[2], data_in + nz_idx_offset_, sizeof(float));
-
-      if (!std::isfinite(nt[0]) || !std::isfinite(nt[1]) || !std::isfinite(nt[2]))
-        continue;
-
-      nt_t = rot * nt;
-
-      memcpy(data_out + nx_idx_offset_, &nt_t[0], sizeof(float));
-      memcpy(data_out + ny_idx_offset_, &nt_t[1], sizeof(float));
-      memcpy(data_out + nz_idx_offset_, &nt_t[2], sizeof(float));
-    }
-  }
-  else {
-    for (std::size_t i = 0; i < input.size(); ++i) {
-      const auto* data_in = reinterpret_cast<const std::uint8_t*>(&input[i]);
-      auto* data_out = reinterpret_cast<std::uint8_t*>(&output[i]);
-      memcpy(&pt[0], data_in + x_idx_offset_, sizeof(float));
-      memcpy(&pt[1], data_in + y_idx_offset_, sizeof(float));
-      memcpy(&pt[2], data_in + z_idx_offset_, sizeof(float));
-
-      if (!std::isfinite(pt[0]) || !std::isfinite(pt[1]) || !std::isfinite(pt[2]))
-        continue;
-
-      pt_t = tr * pt;
-
-      memcpy(data_out + x_idx_offset_, &pt_t[0], sizeof(float));
-      memcpy(data_out + y_idx_offset_, &pt_t[1], sizeof(float));
-      memcpy(data_out + z_idx_offset_, &pt_t[2], sizeof(float));
-    }
-  }
-}
+ //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ template <typename PointSource, typename PointTarget, typename Scalar>
+ template <typename PointT, pcl::traits::HasNormal<PointT>>
+ void
+ IterativeClosestPoint<PointSource, PointTarget, Scalar>::computeTransformedPointCloudWithNormal(const PointCloudSource& input, PointCloudSource& output, const Matrix4& transform)
+ {
+   pcl::transformPointCloudWithNormals(input, output, transform);
+ }
 
 template <typename PointSource, typename PointTarget, typename Scalar>
 void

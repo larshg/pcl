@@ -284,6 +284,25 @@ protected:
                  PointCloudSource& output,
                  const Matrix4& transform);
 
+  
+  template <typename PointT = PointSource, traits::HasNormal<PointT> = true>
+  void
+  computeTransformedPointCloudWithNormal(const PointCloudSource& input,
+                                         PointCloudSource& output,
+                                         const Matrix4& transform);
+
+  template <typename PointT = PointSource, traits::HasNoNormal<PointT> = true>
+  void
+  computeTransformedPointCloudWithNormal(const PointCloudSource& input,
+                                         PointCloudSource& output,
+                                         const Matrix4& transform)
+  {
+    PCL_WARN("[pcl::%s::computeTransformedPointCloudWithNormal] "
+             "use_normal_ == true is not supported in this Point Type.\n",
+             getClassName().c_str());
+  }
+
+
   /** \brief Rigid transformation computation method  with initial guess.
    * \param output the transformed input point cloud dataset using the rigid
    * transformation found \param guess the initial guess of the transformation to
