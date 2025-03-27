@@ -284,6 +284,16 @@ protected:
                  PointCloudSource& output,
                  const Matrix4& transform);
 
+  void
+  transformCloudmemcpy(const PointCloudSource& input,
+                 PointCloudSource& output,
+                 const Matrix4& transform);
+
+   void
+  transformCloudmemcpyOpenMP(const PointCloudSource& input,
+                       PointCloudSource& output,
+                       const Matrix4& transform);
+
   
   template <typename PointT = PointSource, traits::HasNormal<PointT> = true>
   void
