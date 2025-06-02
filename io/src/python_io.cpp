@@ -19,5 +19,7 @@ NB_MODULE(pcl_io_ext, m)
       nb::arg("filePath"));
 
   m.def("loadPCDFile", &pcl::io::loadPCDFile<pcl::PointXYZ>);
+  m.def("loadPCDFile", &pcl::io::loadPCDFile<pcl::PointXYZRGBA>);
   m.def("savePCDFileBinary", &pcl::io::savePCDFileBinary<pcl::PointXYZ>);
+  m.def("savePCDFileBinary", &pcl::io::savePCDFileBinary<pcl::PointXYZRGBA>);
 }

@@ -18,6 +18,17 @@ NB_MODULE(pcl_common_ext, m)
         return nb::str("PointXYZ(x={}, y={}, z={})").format(p.x, p.y, p.z);
       });
 
+  nb::class_<pcl::PointXYZRGBA>(m, "PointXYZRGBA")
+      .def(nb::init())
+      .def(nb::init<float, float, float>())
+      .def_rw("x", &pcl::PointXYZRGBA::x)
+      .def_rw("y", &pcl::PointXYZRGBA::y)
+      .def_rw("z", &pcl::PointXYZRGBA::z)
+      .def("__repr__", [](const pcl::PointXYZRGBA& p) {
+        return nb::str("PointXYZ(x={}, y={}, z={}, r={}, g={}, b={}, a={})").format(p.x, p.y, p.z, p.r, p.g, p.b, p.a);
+      });
+
+
   nb::class_<pcl::PointCloud<pcl::PointXYZ>>(m, "PointcloudXYZ")
       .def(nb::init<>())
       .def("append", &pcl::PointCloud<pcl::PointXYZ>::push_back)
@@ -34,5 +45,29 @@ NB_MODULE(pcl_common_ext, m)
             return nb::make_iterator(nb::type<pcl::PointCloud<pcl::PointXYZ>>(), "iterator",
                                      v.begin(), v.end());
         }, nb::keep_alive<0, 1>());
-      ;
+
+  nb::class_<pcl::PointCloud<pcl::PointXYZRGBA>>(m, "PointcloudXYZRGBA")
+      .def(nb::init<>())
+      .def("append", &pcl::PointCloud<pcl::PointXYZRGBA>::push_back)
+      .def("at",
+           nb::overload_cast<std::size_t>(&pcl::PointCloud<pcl::PointXYZRGBA>::at),
+           "Get a point from the cloud")
+      .def("__getitem__",
+           [](pcl::PointCloud<pcl::PointXYZRGBA>& cloud,
+              std::size_t i) -> pcl::PointXYZRGBA& {
+             return cloud[i];
+           }
+           //, Policy
+           )
+      .def("resize",
+           nb::overload_cast<std::size_t>(&pcl::PointCloud<pcl::PointXYZRGBA>::resize))
+      .def(
+          "__iter__",
+          [](const pcl::PointCloud<pcl::PointXYZRGBA>& v) {
+            return nb::make_iterator(nb::type<pcl::PointCloud<pcl::PointXYZRGBA>>(),
+                                     "iterator",
+                                     v.begin(),
+                                     v.end());
+          },
+          nb::keep_alive<0, 1>());
 }

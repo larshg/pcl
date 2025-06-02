@@ -17,15 +17,22 @@ NB_MODULE(pcl_visualization_ext, m)
                                const std::string&,
                                int>(&pcl::visualization::PCLVisualizer::addPointCloud),
              "Add point cloud to visualizer.")*/
-      .def("AddPointCloudXYZ", // TODO probably not necessary to add XYZ?
+      .def("AddPointCloud", 
            nb::overload_cast<const pcl::PointCloud<pcl::PointXYZ>::ConstPtr&,
                              const std::string&,
                              int>(
            &pcl::visualization::PCLVisualizer::addPointCloud<pcl::PointXYZ>),
            "Add point cloud.")
+      .def("AddPointCloud", 
+           nb::overload_cast<const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr&,
+                             const std::string&,
+                             int>(
+               &pcl::visualization::PCLVisualizer::addPointCloud<pcl::PointXYZRGBA>),
+           "Add point cloud.")
       .def("removeAllShapes", &pcl::visualization::PCLVisualizer::removeAllShapes, "Clear the visualizer.")
       .def("spinOnce", &pcl::visualization::PCLVisualizer::spinOnce,"runs the visualizer loop once")
       .def("addCoordinateSystem",
            nb::overload_cast<double, const std::string&, int>(&pcl::visualization::PCLVisualizer::addCoordinateSystem),
-           "Adds a coordinate system");
+           "Adds a coordinate system")
+    ;
 }

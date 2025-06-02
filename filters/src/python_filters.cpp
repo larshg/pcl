@@ -1,4 +1,6 @@
 #include <nanobind/nanobind.h>
+#include <nanobind/stl/string.h>
+#include <nanobind/stl/shared_ptr.h>
 
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
@@ -20,13 +22,27 @@ NB_MODULE(pcl_filters_ext, m)
       .def("setNegative", &pcl::FilterIndices<pcl::PointXYZ>::setNegative)
       ;
 #endif
-  nb::class_<pcl::PassThrough<pcl::PointXYZ>
-  //, pcl::FilterIndices<pcl::PointXYZ> // parent class
-  >(m, "PassThroughXYZ")
+  nb::class_<pcl::PassThrough<pcl::PointXYZ>>(m, "PassThroughXYZ")
       .def(nb::init<>())
+      .def("setInputCloud", &pcl::PassThrough<pcl::PointXYZ>::setInputCloud)
       .def("setFilterLimits", &pcl::PassThrough<pcl::PointXYZ>::setFilterLimits)
       .def("setFilterFieldName", &pcl::PassThrough<pcl::PointXYZ>::setFilterFieldName)
-      .def("setNegative", &pcl::PassThrough<pcl::PointXYZ>::setNegative) // TODO this is actually a function from FilterIndices
-      .def("filter", nb::overload_cast<pcl::PointCloud<pcl::PointXYZ>&>(&pcl::PassThrough<pcl::PointXYZ>::filter)) // TODO this is actually a function from Filter
+      .def("setNegative", &pcl::FilterIndices<pcl::PointXYZ>::setNegative)
+      .def("filter",
+           nb::overload_cast<pcl::PointCloud<pcl::PointXYZ>&>(
+               &pcl::Filter<pcl::PointXYZ>::filter))
+      ;
+
+  nb::class_<pcl::PassThrough<pcl::PointXYZRGBA>>(m, "PassThroughXYZRGBA")
+      .def(nb::init<>())
+      .def("setInputCloud", &pcl::PassThrough<pcl::PointXYZRGBA>::setInputCloud)
+      .def("setFilterLimits", &pcl::PassThrough<pcl::PointXYZRGBA>::setFilterLimits)
+      .def("setFilterFieldName",
+           &pcl::PassThrough<pcl::PointXYZRGBA>::setFilterFieldName)
+      .def("setNegative",
+           &pcl::FilterIndices<pcl::PointXYZRGBA>::setNegative)
+      .def("filter",
+           nb::overload_cast<pcl::PointCloud<pcl::PointXYZRGBA>&>(
+               &pcl::Filter<pcl::PointXYZRGBA>::filter))
       ;
 }
