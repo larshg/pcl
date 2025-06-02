@@ -29,6 +29,7 @@ NB_MODULE(pcl_common_ext, m)
       });
 
 
+  // TODO must avoid code duplication, maybe write macro?
   nb::class_<pcl::PointCloud<pcl::PointXYZ>>(m, "PointcloudXYZ")
       .def(nb::init<>())
       .def("append", &pcl::PointCloud<pcl::PointXYZ>::push_back)
@@ -37,9 +38,11 @@ NB_MODULE(pcl_common_ext, m)
              [](pcl::PointCloud<pcl::PointXYZ> &cloud, std::size_t i) -> pcl::PointXYZ& {
                  return cloud[i];
              }
-             //, Policy
+             //, TODO to discuss: do we want nb::rv_policy::reference_internal here? See https://nanobind.readthedocs.io/en/latest/api_extra.html#vector-bindings
              )
+      .def("__len__", [](const pcl::PointCloud<pcl::PointXYZ> &v) { return v.size(); })
       .def("resize", nb::overload_cast<std::size_t>(&pcl::PointCloud<pcl::PointXYZ>::resize))
+      .def("clear", [](pcl::PointCloud<pcl::PointXYZ> &v) { v.clear(); })
       .def("__iter__",
         [](const pcl::PointCloud<pcl::PointXYZ> &v) {
             return nb::make_iterator(nb::type<pcl::PointCloud<pcl::PointXYZ>>(), "iterator",
@@ -57,10 +60,12 @@ NB_MODULE(pcl_common_ext, m)
               std::size_t i) -> pcl::PointXYZRGBA& {
              return cloud[i];
            }
-           //, Policy
+           //, TODO to discuss: do we want nb::rv_policy::reference_internal here? See https://nanobind.readthedocs.io/en/latest/api_extra.html#vector-bindings
            )
+      .def("__len__", [](const pcl::PointCloud<pcl::PointXYZRGBA> &v) { return v.size(); })
       .def("resize",
            nb::overload_cast<std::size_t>(&pcl::PointCloud<pcl::PointXYZRGBA>::resize))
+      .def("clear", [](pcl::PointCloud<pcl::PointXYZRGBA> &v) { v.clear(); })
       .def(
           "__iter__",
           [](const pcl::PointCloud<pcl::PointXYZRGBA>& v) {

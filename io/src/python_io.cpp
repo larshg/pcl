@@ -1,6 +1,7 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/io/pcd_io.h>
+#include <pcl/io/ply_io.h>
 
 #include <nanobind/nanobind.h>
 #include <nanobind/stl/string.h>
@@ -20,6 +21,8 @@ NB_MODULE(pcl_io_ext, m)
 
   m.def("loadPCDFile", &pcl::io::loadPCDFile<pcl::PointXYZ>);
   m.def("loadPCDFile", &pcl::io::loadPCDFile<pcl::PointXYZRGBA>);
+  m.def("loadPLYFile", &pcl::io::loadPLYFile<pcl::PointXYZ>);
+  m.def("loadPLYFile", &pcl::io::loadPLYFile<pcl::PointXYZRGBA>);
   m.def("savePCDFileBinary", &pcl::io::savePCDFileBinary<pcl::PointXYZ>);
   m.def("savePCDFileBinary", &pcl::io::savePCDFileBinary<pcl::PointXYZRGBA>);
 }
