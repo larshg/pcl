@@ -37,6 +37,8 @@
 #ifndef __PCL_CUDA_SAFE_CALL_HPP__
 #define __PCL_CUDA_SAFE_CALL_HPP__
 
+#include <pcl/pcl_exports.h>
+
 #include <cuda_runtime_api.h>
 
 #include <iostream>

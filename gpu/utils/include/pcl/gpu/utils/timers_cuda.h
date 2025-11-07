@@ -34,65 +34,38 @@
  *  Author: Anatoly Baskeheev, Itseez Ltd, (myname.mysurname@mycompany.com)
  */
 
-#ifndef _PCL_CUDA_TIMERS_HPP_
-#define _PCL_CUDA_TIMERS_HPP_
+#pragma once
+
+#include <pcl/pcl_exports.h>
 
 #include <cuda_runtime_api.h>
+
 #include <cstdio>
 
-namespace pcl
-{
-    namespace gpu
-    {
-        struct Timer
-        {
-            cudaEvent_t start_, stop_;
-            Timer(bool runTimer = false) 
-            { 
-                cudaEventCreate(&start_); 
-                cudaEventCreate(&stop_);  
-                if (runTimer)
-                    start();
-            }
-            ~Timer() 
-            { 
-                cudaEventDestroy(start_);  
-                cudaEventDestroy(stop_);
-            }
+namespace pcl {
+namespace gpu {
+struct PCL_EXPORTS Timer {
+  cudaEvent_t start_, stop_;
 
-            void start() const { cudaEventRecord(start_, 0); }
-            Timer& stop()  { cudaEventRecord(stop_, 0); cudaEventSynchronize(stop_); return *this; }
+  Timer(bool runTimer = false);
+  ~Timer();
 
-            float time() const
-            {
-                float elapsed_time; 
-                cudaEventElapsedTime(&elapsed_time, start_, stop_);
-                return elapsed_time;
-            }
-        };
+  void
+  start() const;
 
-        struct ScopeTimer
-        {
-            const char* name;
-            cudaEvent_t start, stop;
-            ScopeTimer(const char* name_) : name(name_)
-            {
-                cudaEventCreate(&start); 
-                cudaEventCreate(&stop);  
-                cudaEventRecord(start);
-            }
-            ~ScopeTimer()
-            {
-                float elapsed_time; 
-                cudaEventRecord(stop);	
-                cudaEventSynchronize(stop);
-                cudaEventElapsedTime(&elapsed_time, start, stop);
-                printf("Time(%s) = %fms\n", name, elapsed_time);        
-                cudaEventDestroy(start);  
-                cudaEventDestroy(stop);
-            }
-        };
-    }
-}
+  Timer&
+  stop();
 
-#endif /* _PCL_CUDA_TIMERS_HPP_ */
+  float
+  time() const;
+};
+
+struct PCL_EXPORTS ScopeTimer {
+  const char* name;
+  cudaEvent_t start, stop;
+
+  ScopeTimer(const char* name_);
+  ~ScopeTimer();
+};
+} // namespace gpu
+} // namespace pcl

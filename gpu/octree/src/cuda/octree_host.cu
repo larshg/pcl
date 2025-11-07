@@ -34,7 +34,7 @@
 *  Author: Anatoly Baskeheev, Itseez Ltd, (myname.mysurname@mycompany.com)
 */
 
-#include <pcl/gpu/utils/timers_cuda.hpp>
+#include <pcl/gpu/utils/timers_cuda.h>
 #include <pcl/gpu/utils/safe_call.hpp>
 
 #include "internal.hpp"
