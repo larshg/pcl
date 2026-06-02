@@ -72,6 +72,13 @@ public:
   using typename Base::PointCloudTarget;
 
   enum class RobustFunction { NONE, WELSCH };
+  enum class ConvergenceTrigger {
+    NONE = 0,
+    DEFAULT_CRITERIA,
+    FRICP_STOP_THRESHOLD,
+    ITERATION_LIMIT,
+    NO_CORRESPONDENCES
+  };
 
   FastRobustIterativeClosestPoint();
 
@@ -129,6 +136,9 @@ public:
   void
   setDynamicWelschDecay(double ratio);
 
+  [[nodiscard]] ConvergenceTrigger
+  getLastConvergenceTrigger() const;
+
 protected:
   void
   computeTransformation(PointCloudSource& output, const Matrix4& guess) override;
@@ -156,7 +166,8 @@ private:
                         const Matrix3Xd& target,
                         pcl::search::Search<pcl::PointXYZ>& tree,
                         Matrix3Xd& matched_targets,
-                        VectorXd& residuals) const;
+                        VectorXd& residuals,
+                        pcl::Correspondences* correspondences = nullptr) const;
 
   double
   computeEnergy(const VectorXd& residuals, double nu) const;
@@ -183,6 +194,7 @@ private:
   double nu_begin_ratio_ = 3.0;
   double nu_end_ratio_ = 1.0 / (3.0 * std::sqrt(3.0));
   double nu_decay_ratio_ = 0.5;
+  ConvergenceTrigger last_convergence_trigger_ = ConvergenceTrigger::NONE;
 
   static constexpr double same_threshold_ = 1e-6;
 

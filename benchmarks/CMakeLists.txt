@@ -40,7 +40,12 @@ PCL_ADD_BENCHMARK(search_radius_search FILES search/radius_search.cpp
                   LINK_WITH pcl_io pcl_search pcl_filters
                   ARGUMENTS "${PCL_SOURCE_DIR}/test/table_scene_mug_stereo_textured.pcd")
 
+set(FRICP_BENCHMARK_LINK_LIBS pcl_io pcl_filters pcl_registration)
+if(TARGET pcl_visualization)
+  list(APPEND FRICP_BENCHMARK_LINK_LIBS pcl_visualization)
+endif()
+
 PCL_ADD_BENCHMARK(registration_fricp FILES registration/fricp.cpp
-                  LINK_WITH pcl_io pcl_filters pcl_registration
+                  LINK_WITH ${FRICP_BENCHMARK_LINK_LIBS}
                   ARGUMENTS "${PCL_SOURCE_DIR}/test/bun0.pcd"
                             "${PCL_SOURCE_DIR}/test/bun4.pcd")

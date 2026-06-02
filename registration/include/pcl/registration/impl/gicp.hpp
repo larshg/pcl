@@ -770,6 +770,15 @@ GeneralizedIterativeClosestPoint<PointSource, PointTarget, Scalar>::
     computeTransformation(PointCloudSource& output, const Matrix4& guess)
 {
   pcl::IterativeClosestPoint<PointSource, PointTarget, Scalar>::initComputeReciprocal();
+  auto convergence_criteria = this->getConvergeCriteria();
+  if (convergence_criteria) {
+    convergence_criteria->setMaximumIterations(max_iterations_);
+    convergence_criteria->setRelativeMSE(this->euclidean_fitness_epsilon_);
+    convergence_criteria->setTranslationThreshold(transformation_epsilon_);
+    convergence_criteria->setConvergenceState(
+        pcl::registration::DefaultConvergenceCriteria<
+            Scalar>::CONVERGENCE_CRITERIA_NOT_CONVERGED);
+  }
   // Difference between consecutive transforms
   double delta = 0;
   // Get the size of the source point cloud
@@ -824,6 +833,21 @@ GeneralizedIterativeClosestPoint<PointSource, PointTarget, Scalar>::
         output, *output_transformed, transformation_.template cast<float>(), false);
     corr_estimation.setInputSource(output_transformed);
     corr_estimation.determineCorrespondences(correspondences, corr_dist_threshold_);
+
+    if (convergence_criteria) {
+      *this->correspondences_ = correspondences;
+    }
+
+    if (correspondences.size() < static_cast<std::size_t>(min_number_correspondences_)) {
+      if (convergence_criteria) {
+        convergence_criteria->setConvergenceState(
+            pcl::registration::DefaultConvergenceCriteria<
+                Scalar>::CONVERGENCE_CRITERIA_NO_CORRESPONDENCES);
+      }
+      converged_ = false;
+      break;
+    }
+
     cnt = 0;
     for (const auto& corr : correspondences) {
       source_indices[cnt] = corr.index_query;
@@ -862,6 +886,11 @@ GeneralizedIterativeClosestPoint<PointSource, PointTarget, Scalar>::
       PCL_DEBUG("[pcl::%s::computeTransformation] Optimization issue %s\n",
                 getClassName().c_str(),
                 e.what());
+      if (convergence_criteria) {
+        convergence_criteria->setConvergenceState(
+            pcl::registration::DefaultConvergenceCriteria<
+                Scalar>::CONVERGENCE_CRITERIA_NOT_CONVERGED);
+      }
       break;
     }
     nr_iterations_++;
@@ -873,8 +902,28 @@ GeneralizedIterativeClosestPoint<PointSource, PointTarget, Scalar>::
     }
 
     // Check for convergence
-    if (nr_iterations_ >= max_iterations_ || delta < 1) {
+    if (nr_iterations_ >= max_iterations_) {
       converged_ = true;
+      if (convergence_criteria) {
+        convergence_criteria->setConvergenceState(
+            pcl::registration::DefaultConvergenceCriteria<
+                Scalar>::CONVERGENCE_CRITERIA_ITERATIONS);
+      }
+      PCL_DEBUG("[pcl::%s::computeTransformation] Convergence reached. Number of "
+                "iterations: %d out of %d. Transformation difference: %f\n",
+                getClassName().c_str(),
+                nr_iterations_,
+                max_iterations_,
+                (transformation_ - previous_transformation_).array().abs().sum());
+      previous_transformation_ = transformation_;
+    }
+    else if (delta < 1) {
+      converged_ = true;
+      if (convergence_criteria) {
+        convergence_criteria->setConvergenceState(
+            pcl::registration::DefaultConvergenceCriteria<
+                Scalar>::CONVERGENCE_CRITERIA_TRANSFORM);
+      }
       PCL_DEBUG("[pcl::%s::computeTransformation] Convergence reached. Number of "
                 "iterations: %d out of %d. Transformation difference: %f\n",
                 getClassName().c_str(),
