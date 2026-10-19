@@ -17,10 +17,7 @@ set(CMAKE_AUTOUIC ON)
 
 list(APPEND CMAKE_AUTOUIC_SEARCH_PATHS "src")
 
-if(VTK_FOUND)
-  set(incs "include/pcl/${SUBSYS_NAME}/render_views_tesselated_sphere.h")
-  set(srcs "src/render_views_tesselated_sphere.cpp")
-endif()
+set(incs "include/pcl/${SUBSYS_NAME}/render_views_tesselated_sphere.h")
 
 if(QHULL_FOUND)
   set(incs

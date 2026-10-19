@@ -35,6 +35,7 @@
  *
  */
 
+#include <pcl/visualization/render_views_tesselated_sphere.h>
 #include <pcl/visualization/pcl_visualizer.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/common/transforms.h>
@@ -44,6 +45,8 @@
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/console/print.h>
 #include <pcl/console/parse.h>
+
+#include <fstream>
 
 using namespace pcl;
 using namespace pcl::io;
@@ -109,6 +112,15 @@ main (int argc, char **argv)
     return (-1);
   }
 
+  const int input_file_index = ply_file_indices.size () == 1 ? ply_file_indices[0] : obj_file_indices[0];
+  const char *input_file_name = argv[input_file_index];
+  std::ifstream input_file (input_file_name, std::ios::binary);
+  if (!input_file)
+  {
+    print_error ("Input file '%s' could not be found or opened.\n", input_file_name);
+    return (-1);
+  }
+
   vtkSmartPointer<vtkPolyData> polydata1;
   if (ply_file_indices.size () == 1)
   {
@@ -125,24 +137,29 @@ main (int argc, char **argv)
     polydata1 = readerQuery->GetOutput ();
   }
 
-  visualization::PCLVisualizer vis;
-  vis.addModelFromPolyData (polydata1, "mesh1", 0);
-  vis.setRepresentationToSurfaceForAllActors ();
+  visualization::RenderViewsTesselatedSphere render_views;
+  render_views.setResolution (resolution);
+  render_views.setTesselationLevel (tesselated_sphere_level);
+  render_views.setComputeEntropies (true);
+  render_views.addModelFromPolyData (polydata1);
+  render_views.generateViews ();
 
-  PointCloud<PointXYZ>::CloudVectorType views_xyz;
+  std::vector<PointCloud<PointXYZ>::Ptr> views_xyz_ptr;
   std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f> > poses;
   std::vector<float> enthropies;
-  vis.renderViewTesselatedSphere (resolution, resolution, views_xyz, poses, enthropies, tesselated_sphere_level);
+  render_views.getViews (views_xyz_ptr);
+  render_views.getPoses (poses);
+  render_views.getEntropies (enthropies);
 
   //take views and fuse them together
   std::vector<PointCloud<PointXYZ>::Ptr> aligned_clouds;
 
-  for (std::size_t i = 0; i < views_xyz.size (); i++)
+  for (std::size_t i = 0; i < views_xyz_ptr.size (); i++)
   {
     PointCloud<PointXYZ>::Ptr cloud (new PointCloud<PointXYZ> ());
     Eigen::Matrix4f pose_inverse;
     pose_inverse = poses[i].inverse ();
-    transformPointCloud (views_xyz[i], *cloud, pose_inverse);
+    transformPointCloud (*views_xyz_ptr[i], *cloud, pose_inverse);
     aligned_clouds.push_back (cloud);
   }
 

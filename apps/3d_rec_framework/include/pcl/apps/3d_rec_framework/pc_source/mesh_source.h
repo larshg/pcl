@@ -9,7 +9,7 @@
 
 #include <pcl/apps/3d_rec_framework/pc_source/source.h>
 #include <pcl/apps/3d_rec_framework/utils/vtk_model_sampling.h>
-#include <pcl/apps/render_views_tesselated_sphere.h>
+#include <pcl/visualization/render_views_tesselated_sphere.h>
 #include <pcl/io/pcd_io.h>
 
 #include <vtkVersion.h>
@@ -176,7 +176,7 @@ public:
 #endif
 
       // generate views
-      pcl::apps::RenderViewsTesselatedSphere render_views;
+      pcl::visualization::RenderViewsTesselatedSphere render_views;
       render_views.setResolution(resolution_);
       render_views.setUseVertices(false);
       render_views.setRadiusSphere(radius_sphere_);

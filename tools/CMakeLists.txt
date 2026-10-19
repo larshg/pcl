@@ -207,6 +207,19 @@ if(TARGET pcl_filters)
     PCL_ADD_EXECUTABLE(pcl_mesh2pcd COMPONENT ${SUBSYS_NAME} SOURCES mesh2pcd.cpp)
     target_link_libraries(pcl_mesh2pcd pcl_common pcl_io pcl_filters pcl_visualization)
 
+    if(BUILD_global_tests)
+      enable_testing()
+      add_test(NAME tools_mesh2pcd_missing_input
+               COMMAND $<TARGET_FILE:pcl_mesh2pcd>
+                       "${CMAKE_CURRENT_BINARY_DIR}/missing_mesh2pcd_input.ply"
+                       "${CMAKE_CURRENT_BINARY_DIR}/missing_mesh2pcd_output.pcd"
+                       -no_vis_result)
+      set_tests_properties(tools_mesh2pcd_missing_input
+                           PROPERTIES
+                             WILL_FAIL TRUE
+                             PASS_REGULAR_EXPRESSION "Input file .* could not be found or opened\\.")
+    endif()
+
     PCL_ADD_EXECUTABLE(pcl_mesh_sampling COMPONENT ${SUBSYS_NAME} SOURCES mesh_sampling.cpp)
     target_link_libraries(pcl_mesh_sampling pcl_common pcl_io pcl_filters pcl_visualization)
 

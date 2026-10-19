@@ -42,6 +42,7 @@ set(srcs
   src/vtk/vtkRenderWindowInteractorFix.cpp
   src/pcl_painter2D.cpp
   src/pcl_plotter.cpp
+  src/render_views_tesselated_sphere.cpp
 )
 
 if(${VTK_VERSION} VERSION_GREATER_EQUAL 9.0 AND UNIX AND NOT ANDROID AND NOT APPLE AND NOT APPLE_IOS)
@@ -77,6 +78,7 @@ set(incs
   "include/pcl/${SUBSYS_NAME}/simple_buffer_visualizer.h"
   "include/pcl/${SUBSYS_NAME}/pcl_plotter.h"
   "include/pcl/${SUBSYS_NAME}/qvtk_compatibility.h"
+  "include/pcl/${SUBSYS_NAME}/render_views_tesselated_sphere.h"
 )
 
 set(common_incs

@@ -5,7 +5,7 @@
  *      Author: aitor
  */
 
-#include <pcl/apps/render_views_tesselated_sphere.h>
+#include <pcl/visualization/render_views_tesselated_sphere.h>
 #include <pcl/visualization/vtk/pcl_vtk_compatibility.h>
 #include <pcl/point_types.h>
 
@@ -32,7 +32,7 @@
 #include <array>
 
 void
-pcl::apps::RenderViewsTesselatedSphere::generateViews()
+pcl::visualization::RenderViewsTesselatedSphere::generateViews()
 {
   // center object
   double CoM[3];
